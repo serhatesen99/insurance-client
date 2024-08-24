@@ -90,6 +90,14 @@ const TravelInfo = ({ personalInfo, onNext }) => {
       return;
     }
 
+  
+    const insuranceDetails = {
+      travelDate: `${policyStart} - ${policyEnd}`,
+      region: travelArea,
+      reason: travelReason,
+    };
+    sessionStorage.setItem("insuranceDetails", JSON.stringify(insuranceDetails));
+    
     setFormError({});
     dispatch(setPrices(calculatedPrices));
     onNext();
@@ -164,7 +172,7 @@ const TravelInfo = ({ personalInfo, onNext }) => {
             />
           </RadioGroup>
           {formError.travelArea && (
-            <FormHelperText sx={{ color: "", fontSize: "1rem" }}>
+            <FormHelperText sx={{ color: "red", fontSize: "1rem" }}>
               {formError.travelArea}
             </FormHelperText>
           )}

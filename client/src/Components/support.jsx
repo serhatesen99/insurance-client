@@ -1,29 +1,49 @@
 import React, { useState, useEffect } from "react";
 
 const Support = ({ onNext }) => {
-  const [supportOption, setSupportOption] = useState("Müşteri Hizmetlerinden destek almak istiyorum."); 
+  const [supportOption, setSupportOption] = useState(
+    "Müşteri Hizmetlerinden destek almak istiyorum."
+  );
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [healthInfoAccepted, setHealthInfoAccepted] = useState(false);
   const [error, setError] = useState("");
   const [fiyat, setFiyat] = useState(0);
   const [insuranceDetails, setInsuranceDetails] = useState({
-    name: "Serhat Esen",
-    travelDate: "03/08/24-09/09/25",
-    region: "Avrupa",
-    reason: "Eğitim",
+    name: "",
+    travelDate: "",
+    region: "",
+    reason: "",
   });
 
   useEffect(() => {
-    // Fiyatı sessionStorage'dan alın
+    const firstName = sessionStorage.getItem("firstName") || "";
+    const lastName = sessionStorage.getItem("lastName") || "";
+    const fullName = `${firstName} ${lastName}`;
+
+    const savedInsuranceDetails = JSON.parse(
+      sessionStorage.getItem("insuranceDetails")
+    ) || { travelDate: "", region: "", reason: "" };
+
+    setInsuranceDetails({
+      name: fullName,
+      travelDate: savedInsuranceDetails.travelDate || "",
+      region: savedInsuranceDetails.region || "",
+      reason: savedInsuranceDetails.reason || "",
+    });
+
     const storedPrice = sessionStorage.getItem("fiyat");
     if (storedPrice) {
       setFiyat(parseFloat(storedPrice) || 0);
     }
 
-    // Sigorta detaylarını sessionStorage'dan alın
-    const storedDetails = JSON.parse(sessionStorage.getItem("insuranceDetails"));
+    const storedDetails = JSON.parse(
+      sessionStorage.getItem("insuranceDetails")
+    );
     if (storedDetails) {
-      setInsuranceDetails(storedDetails);
+      setInsuranceDetails((prevDetails) => ({
+        ...prevDetails,
+        ...storedDetails,
+      }));
     }
   }, []);
 
@@ -35,7 +55,9 @@ const Support = ({ onNext }) => {
     }
 
     if (!healthInfoAccepted) {
-      errorMessages.push("Seyahat Sağlık Bilgilendirme Formu'nu onaylamanız gerekiyor.");
+      errorMessages.push(
+        "Seyahat Sağlık Bilgilendirme Formu'nu onaylamanız gerekiyor."
+      );
     }
 
     if (errorMessages.length > 0) {
@@ -96,8 +118,8 @@ const Support = ({ onNext }) => {
   };
 
   const titleStyle = {
-    color: "#007AB3", 
-    borderBottom: "1px solid #ccc", 
+    color: "#007AB3",
+    borderBottom: "1px solid #ccc",
     paddingBottom: "10px",
     marginBottom: "40px",
     marginTop: "30px",
@@ -181,9 +203,10 @@ const Support = ({ onNext }) => {
   return (
     <div style={containerStyle}>
       <h2 style={sectionStyle}>
-        {insuranceDetails.name || "Sigortalının Bilgileri"}, size özel teklifimiz:
+        {insuranceDetails.name || "Sigortalının Bilgileri"}, size özel
+        teklifimiz:
       </h2>
-      <h1 style={priceStyle}>{fiyat}₺</h1> 
+      <h1 style={priceStyle}>{fiyat}₺</h1>
       <div style={sectionStyle}>
         <div style={checkboxStyle}>
           <input
@@ -207,7 +230,11 @@ const Support = ({ onNext }) => {
             </span>
           </label>
         </div>
-        {!termsAccepted && <div style={errorStyle}>Mesafeli Satış Sözleşmesi'ni onaylamanız gerekiyor.</div>}
+        {!termsAccepted && (
+          <div style={errorStyle}>
+            Mesafeli Satış Sözleşmesi'ni onaylamanız gerekiyor.
+          </div>
+        )}
 
         <div style={checkboxStyle}>
           <input
@@ -231,7 +258,11 @@ const Support = ({ onNext }) => {
             </span>
           </label>
         </div>
-        {!healthInfoAccepted && <div style={errorStyle}>Seyahat Sağlık Bilgilendirme Formu'nu onaylamanız gerekiyor.</div>}
+        {!healthInfoAccepted && (
+          <div style={errorStyle}>
+            Seyahat Sağlık Bilgilendirme Formu'nu onaylamanız gerekiyor.
+          </div>
+        )}
       </div>
       <button
         style={buttonStyle}
@@ -241,11 +272,13 @@ const Support = ({ onNext }) => {
       >
         ONLINE SATIN AL
       </button>
-      <h3 style={{ 
-        color: "#000", 
-        borderBottom: "none", 
-        marginTop: "40px" 
-      }}>
+      <h3
+        style={{
+          color: "#000",
+          borderBottom: "none",
+          marginTop: "40px",
+        }}
+      >
         Satış sonrası desteğinizi nasıl almak istersiniz?
       </h3>
       <div style={supportOptionsContainerStyle}>
@@ -255,7 +288,9 @@ const Support = ({ onNext }) => {
               ? selectedOptionStyle
               : optionStyle
           }
-          onClick={() => setSupportOption("Müşteri Hizmetlerinden destek almak istiyorum.")}
+          onClick={() =>
+            setSupportOption("Müşteri Hizmetlerinden destek almak istiyorum.")
+          }
         >
           <input
             type="radio"
@@ -265,7 +300,9 @@ const Support = ({ onNext }) => {
             checked={
               supportOption === "Müşteri Hizmetlerinden destek almak istiyorum."
             }
-            onChange={() => setSupportOption("Müşteri Hizmetlerinden destek almak istiyorum.")}
+            onChange={() =>
+              setSupportOption("Müşteri Hizmetlerinden destek almak istiyorum.")
+            }
           />
           <label htmlFor="customer-service">
             <strong>Müşteri Hizmetlerinden destek almak istiyorum.</strong>
@@ -286,17 +323,20 @@ const Support = ({ onNext }) => {
             name="support-option"
             value="Acenteden destek almak istiyorum."
             checked={supportOption === "Acenteden destek almak istiyorum."}
-            onChange={() => setSupportOption("Acenteden destek almak istiyorum.")}
+            onChange={() =>
+              setSupportOption("Acenteden destek almak istiyorum.")
+            }
           />
           <label htmlFor="agency">
             <strong>Acenteden destek almak istiyorum.</strong>
             <p>
-              Seçeceğiniz acenteniz ile iletişime geçebilir veya Allianz Müşteri Hizmetleri’nden destek alabilirsiniz.
+              Seçeceğiniz acenteniz ile iletişime geçebilir veya Allianz Müşteri
+              Hizmetleri’nden destek alabilirsiniz.
             </p>
           </label>
         </div>
       </div>
-      {/* Acenta Bilgileri */}
+
       {supportOption === "Acenteden destek almak istiyorum." && (
         <div style={agencyInfoStyle}>
           <h3 style={{ color: "#007AB3" }}>Acente Bilgileriniz</h3>
@@ -307,7 +347,7 @@ const Support = ({ onNext }) => {
           <p>5516006173</p>
         </div>
       )}
-      {/* Bilgi Özetiniz */}
+
       <div style={infoSummaryStyle}>
         <h3 style={titleStyle}>Bilgi Özetiniz</h3>
 
@@ -330,6 +370,3 @@ const Support = ({ onNext }) => {
 };
 
 export default Support;
-
-
-

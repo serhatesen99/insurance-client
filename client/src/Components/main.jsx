@@ -162,6 +162,8 @@ const InsuranceForm = ({ onNext }) => {
         userAgreementAccepted: userAgreementAcceptedError,
       });
     } else {
+      sessionStorage.setItem("firstName", formData.firstName);
+      sessionStorage.setItem("lastName", formData.lastName);
       onNext(formData);
     }
   };
@@ -172,6 +174,7 @@ const InsuranceForm = ({ onNext }) => {
       justifyContent="center"
       alignItems="center"
       height="130vh"
+     
     >
       <Box sx={{ width: "100%", maxWidth: "400px", padding: 2 }}>
         <Box display="flex" justifyContent="center" alignItems="center">
