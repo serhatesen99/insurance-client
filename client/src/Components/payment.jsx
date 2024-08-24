@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -11,51 +11,52 @@ import {
   Box,
 } from "@mui/material";
 
-const currentYear = new Date().getFullYear();
-const currentMonth = new Date().getMonth() + 1;
+const PaymentForm = ({ onNext }) => {
+  const [fiyat, setFiyat] = useState(0);
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1;
 
-const validationSchema = yup.object().shape({
-  name: yup.string().required("Kart sahibinin adı soyadı zorunludur"),
-  cardNumber: yup
-    .string()
-    .matches(/^[0-9]{16}$/, "Kart numarası 16 haneli olmalıdır")
-    .required("Kart numarası zorunludur"),
-  expiryMonth: yup
-    .string()
-    .required("Son kullanma tarihi - ay zorunludur")
-    .test("is-future-date", "Son kullanma tarihi geçersiz", function (value) {
-      const { expiryYear } = this.parent;
-      if (!expiryYear) return true;
-      return (
-        parseInt(expiryYear, 10) > currentYear ||
-        (parseInt(expiryYear, 10) === currentYear &&
-          parseInt(value, 10) >= currentMonth)
-      );
-    }),
-  expiryYear: yup
-    .string()
-    .required("Son kullanma tarihi - yıl zorunludur")
-    .test(
-      "is-future-year",
-      "Son kullanma tarihi geçersiz",
-      function (value) {
-        const { expiryMonth } = this.parent;
-        if (!expiryMonth) return true; 
+  const validationSchema = yup.object().shape({
+    name: yup.string().required("Kart sahibinin adı soyadı zorunludur"),
+    cardNumber: yup
+      .string()
+      .matches(/^[0-9]{16}$/, "Kart numarası 16 haneli olmalıdır")
+      .required("Kart numarası zorunludur"),
+    expiryMonth: yup
+      .string()
+      .required("Son kullanma tarihi - ay zorunludur")
+      .test("is-future-date", "Son kullanma tarihi geçersiz", function (value) {
+        const { expiryYear } = this.parent;
+        if (!expiryYear) return true;
         return (
-          parseInt(value, 10) > currentYear ||
-          (parseInt(value, 10) === currentYear &&
-            parseInt(expiryMonth, 10) >= currentMonth)
+          parseInt(expiryYear, 10) > currentYear ||
+          (parseInt(expiryYear, 10) === currentYear &&
+            parseInt(value, 10) >= currentMonth)
         );
-      }
-    ),
-  cvv: yup
-    .string()
-    .matches(/^[0-9]{3}$/, "CVV 3 haneli olmalıdır")
-    .required("CVV kodu zorunludur"),
-  paymentType: yup.string().required("Ödeme tipi seçilmelidir"),
-});
+      }),
+    expiryYear: yup
+      .string()
+      .required("Son kullanma tarihi - yıl zorunludur")
+      .test(
+        "is-future-year",
+        "Son kullanma tarihi geçersiz",
+        function (value) {
+          const { expiryMonth } = this.parent;
+          if (!expiryMonth) return true;
+          return (
+            parseInt(value, 10) > currentYear ||
+            (parseInt(value, 10) === currentYear &&
+              parseInt(expiryMonth, 10) >= currentMonth)
+          );
+        }
+      ),
+    cvv: yup
+      .string()
+      .matches(/^[0-9]{3}$/, "CVV 3 haneli olmalıdır")
+      .required("CVV kodu zorunludur"),
+    paymentType: yup.string().required("Ödeme tipi seçilmelidir"),
+  });
 
-const PaymentForm = ({onNext}) => {
   const {
     handleSubmit,
     control,
@@ -66,7 +67,7 @@ const PaymentForm = ({onNext}) => {
 
   const onSubmit = (data) => {
     console.log("Form Data:", data);
-    onNext();  
+    onNext();
   };
 
   const months = Array.from({ length: 12 }, (_, i) =>
@@ -75,6 +76,14 @@ const PaymentForm = ({onNext}) => {
   const years = Array.from({ length: 10 }, (_, i) =>
     String(new Date().getFullYear() + i)
   );
+
+  useEffect(() => {
+    // Fiyatı sessionStorage'dan alın
+    const storedPrice = sessionStorage.getItem("fiyat");
+    if (storedPrice) {
+      setFiyat(parseFloat(storedPrice) || 0);
+    }
+  }, []);
 
   return (
     <Box
@@ -93,9 +102,9 @@ const PaymentForm = ({onNext}) => {
         align="center"
         color="primary"
         gutterBottom
-        sx={{ fontWeight: "bold", fontSize: "2.5rem" }} 
+        sx={{ fontWeight: "bold", fontSize: "2.5rem" }}
       >
-        830,61 ₺
+        {fiyat} ₺
       </Typography>
 
       <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: "bold" }}>
@@ -240,4 +249,5 @@ const PaymentForm = ({onNext}) => {
 };
 
 export default PaymentForm;
+
 

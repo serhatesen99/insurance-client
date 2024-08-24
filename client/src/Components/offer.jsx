@@ -173,7 +173,7 @@ const OfferComponent = ({ onNext }) => {
             Önerilen Paket
           </Box>
         )}
-        <CardContent sx={{ position: "relative", zIndex: 0 , }}>
+        <CardContent sx={{ position: "relative", zIndex: 0 }}>
           <Typography variant="h6" align="center">
             {offer.name}
           </Typography>
@@ -183,9 +183,6 @@ const OfferComponent = ({ onNext }) => {
             sx={{ color: isSelected ? "#1f19d2" : "#000" }}
           >
             {offer.price}
-          </Typography>
-          <Typography variant="body2" align="center">
-            {offer.monthly}
           </Typography>
         </CardContent>
         <CardActions>
@@ -267,11 +264,10 @@ const OfferComponent = ({ onNext }) => {
                         selectedOffer === offer.name ? "#C1EBFB" : "inherit",
                     }}
                   >
-                    {offer.coverage.bagajkaybı}
+                    {offer.coverage.missedFlight}
                   </TableCell>
                 ))}
               </TableRow>
-
               <TableRow>
                 <TableCell>
                   Kaza Ve Ani Rahatsızlık Sonucu Tedavi Masrafları
@@ -597,6 +593,7 @@ const OfferComponent = ({ onNext }) => {
                   </TableCell>
                 ))}
               </TableRow>
+
               <TableRow>
                 <TableCell>
                   Taburcu Olduktan Sonra İkametgahına Geri Dönüş
@@ -697,10 +694,11 @@ const OfferComponent = ({ onNext }) => {
     const handleSelectAdditionalCoverage = (coverageNames) => {
       setSelectedAdditionalCoverage(coverageNames);
     };
-
     const calculateTotalPrice = () => {
+      // Fiyat hesaplama kodunuz
       const basePrice =
-        offers.find((offer) => offer.name === selectedOffer)?.price || 0;
+        offers.find((offer) => offer.name === selectedOffer)?.price ||
+        "0,00 EUR";
       const additionalCoveragePrice = selectedAdditionalCoverage.length * 150;
       return (
         (parseFloat(basePrice.replace(/[^0-9,.]/g, "")) || 0) +
@@ -708,7 +706,13 @@ const OfferComponent = ({ onNext }) => {
       );
     };
 
-    const fiyat = calculateTotalPrice
+    // Fiyatı sessionStorage'a kaydedin
+    const fiyat = calculateTotalPrice();
+    sessionStorage.setItem("fiyat", fiyat);
+    console.log(
+      "Fiyat Session Storage'a kaydedildi:",
+      sessionStorage.getItem("fiyat")
+    );
 
     return (
       <Container maxWidth="lg">
@@ -744,7 +748,7 @@ const OfferComponent = ({ onNext }) => {
               variant="h6"
               sx={{ fontWeight: "bold", fontSize: "1.5rem" }}
             >
-              Toplam Fiyat: {fiyat()} TL
+              Toplam Fiyat: {fiyat} TL
             </Typography>
             <Button variant="contained" color="primary" onClick={onNext}>
               Hemen Satın Al
@@ -754,6 +758,7 @@ const OfferComponent = ({ onNext }) => {
       </Container>
     );
   };
+
   return <TeklifAlPage />;
 };
 

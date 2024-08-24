@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from "react";
 
-const Support = ({ onNext, fiyat }) => {
-  const [insuranceDetails, setInsuranceDetails] = useState(null);
-  const [supportOption, setSupportOption] = useState(
-    "Müşteri Hizmetlerinden destek almak istiyorum."
-  ); // Varsayılan seçim
+const Support = ({ onNext }) => {
+  const [supportOption, setSupportOption] = useState("Müşteri Hizmetlerinden destek almak istiyorum."); 
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [healthInfoAccepted, setHealthInfoAccepted] = useState(false);
   const [error, setError] = useState("");
+  const [fiyat, setFiyat] = useState(0);
+  const [insuranceDetails, setInsuranceDetails] = useState({
+    name: "Serhat Esen",
+    travelDate: "03/08/24-09/09/25",
+    region: "Avrupa",
+    reason: "Eğitim",
+  });
 
   useEffect(() => {
-    const fetchInsuranceDetails = async () => {
-      return {
-        name: "S***** E***",
-        travelDate: "22/08/2024 - 25/08/2024",
-        region: "Avrupa",
-        reason: "İş/Turistik",
-      };
-    };
+    // Fiyatı sessionStorage'dan alın
+    const storedPrice = sessionStorage.getItem("fiyat");
+    if (storedPrice) {
+      setFiyat(parseFloat(storedPrice) || 0);
+    }
 
-    const getData = async () => {
-      const fetchedInsuranceDetails = await fetchInsuranceDetails();
-      setInsuranceDetails(fetchedInsuranceDetails);
-    };
-
-    getData();
+    // Sigorta detaylarını sessionStorage'dan alın
+    const storedDetails = JSON.parse(sessionStorage.getItem("insuranceDetails"));
+    if (storedDetails) {
+      setInsuranceDetails(storedDetails);
+    }
   }, []);
 
   const handleSubmit = () => {
@@ -35,9 +35,7 @@ const Support = ({ onNext, fiyat }) => {
     }
 
     if (!healthInfoAccepted) {
-      errorMessages.push(
-        "Seyahat Sağlık Bilgilendirme Formu'nu onaylamanız gerekiyor."
-      );
+      errorMessages.push("Seyahat Sağlık Bilgilendirme Formu'nu onaylamanız gerekiyor.");
     }
 
     if (errorMessages.length > 0) {
@@ -47,10 +45,6 @@ const Support = ({ onNext, fiyat }) => {
       onNext();
     }
   };
-
-  if (!insuranceDetails) {
-    return <div>Yükleniyor...</div>;
-  }
 
   const containerStyle = {
     display: "flex",
@@ -102,8 +96,8 @@ const Support = ({ onNext, fiyat }) => {
   };
 
   const titleStyle = {
-    color: "#007AB3", // Başlığın rengi
-    borderBottom: "1px solid #ccc", // Üstte gri çizgi
+    color: "#007AB3", 
+    borderBottom: "1px solid #ccc", 
     paddingBottom: "10px",
     marginBottom: "40px",
     marginTop: "30px",
@@ -187,10 +181,9 @@ const Support = ({ onNext, fiyat }) => {
   return (
     <div style={containerStyle}>
       <h2 style={sectionStyle}>
-        {insuranceDetails.name}, size özel teklifimiz:
+        {insuranceDetails.name || "Sigortalının Bilgileri"}, size özel teklifimiz:
       </h2>
-      <h1 style={priceStyle}>{fiyat}₺</h1>{" "}
-      {/* Fiyat prop'u üzerinden gösterim */}
+      <h1 style={priceStyle}>{fiyat}₺</h1> 
       <div style={sectionStyle}>
         <div style={checkboxStyle}>
           <input
@@ -198,7 +191,6 @@ const Support = ({ onNext, fiyat }) => {
             id="terms"
             checked={termsAccepted}
             onChange={(e) => setTermsAccepted(e.target.checked)}
-            style={{ cursor: "pointer" }}
           />
           <label
             htmlFor="terms"
@@ -215,10 +207,7 @@ const Support = ({ onNext, fiyat }) => {
             </span>
           </label>
         </div>
-        <div style={errorStyle}>
-          {!termsAccepted &&
-            "Mesafeli Satış Sözleşmesi'ni onaylamanız gerekiyor."}
-        </div>
+        {!termsAccepted && <div style={errorStyle}>Mesafeli Satış Sözleşmesi'ni onaylamanız gerekiyor.</div>}
 
         <div style={checkboxStyle}>
           <input
@@ -226,7 +215,6 @@ const Support = ({ onNext, fiyat }) => {
             id="health-info"
             checked={healthInfoAccepted}
             onChange={(e) => setHealthInfoAccepted(e.target.checked)}
-            style={{ cursor: "pointer" }}
           />
           <label
             htmlFor="health-info"
@@ -243,10 +231,7 @@ const Support = ({ onNext, fiyat }) => {
             </span>
           </label>
         </div>
-        <div style={errorStyle}>
-          {!healthInfoAccepted &&
-            "Seyahat Sağlık Bilgilendirme Formu'nu onaylamanız gerekiyor."}
-        </div>
+        {!healthInfoAccepted && <div style={errorStyle}>Seyahat Sağlık Bilgilendirme Formu'nu onaylamanız gerekiyor.</div>}
       </div>
       <button
         style={buttonStyle}
@@ -256,7 +241,13 @@ const Support = ({ onNext, fiyat }) => {
       >
         ONLINE SATIN AL
       </button>
-      {/* Satış Sonrası Destek Seçenekleri */}
+      <h3 style={{ 
+        color: "#000", 
+        borderBottom: "none", 
+        marginTop: "40px" 
+      }}>
+        Satış sonrası desteğinizi nasıl almak istersiniz?
+      </h3>
       <div style={supportOptionsContainerStyle}>
         <div
           style={
@@ -264,9 +255,7 @@ const Support = ({ onNext, fiyat }) => {
               ? selectedOptionStyle
               : optionStyle
           }
-          onClick={() =>
-            setSupportOption("Müşteri Hizmetlerinden destek almak istiyorum.")
-          }
+          onClick={() => setSupportOption("Müşteri Hizmetlerinden destek almak istiyorum.")}
         >
           <input
             type="radio"
@@ -276,9 +265,7 @@ const Support = ({ onNext, fiyat }) => {
             checked={
               supportOption === "Müşteri Hizmetlerinden destek almak istiyorum."
             }
-            onChange={() =>
-              setSupportOption("Müşteri Hizmetlerinden destek almak istiyorum.")
-            }
+            onChange={() => setSupportOption("Müşteri Hizmetlerinden destek almak istiyorum.")}
           />
           <label htmlFor="customer-service">
             <strong>Müşteri Hizmetlerinden destek almak istiyorum.</strong>
@@ -299,15 +286,12 @@ const Support = ({ onNext, fiyat }) => {
             name="support-option"
             value="Acenteden destek almak istiyorum."
             checked={supportOption === "Acenteden destek almak istiyorum."}
-            onChange={() =>
-              setSupportOption("Acenteden destek almak istiyorum.")
-            }
+            onChange={() => setSupportOption("Acenteden destek almak istiyorum.")}
           />
           <label htmlFor="agency">
             <strong>Acenteden destek almak istiyorum.</strong>
             <p>
-              Seçeceğiniz acenteniz ile iletişime geçebilir veya Allianz Müşteri
-              Hizmetleri’nden destek alabilirsiniz.
+              Seçeceğiniz acenteniz ile iletişime geçebilir veya Allianz Müşteri Hizmetleri’nden destek alabilirsiniz.
             </p>
           </label>
         </div>
@@ -335,9 +319,7 @@ const Support = ({ onNext, fiyat }) => {
 
         {/* Seyahat Bilgileri */}
         <div style={travelInfoStyle}>
-          <h3 style={{ marginTop: "20px", marginBottom: "20px" }}>
-            Seyahat Bilgileri
-          </h3>
+          <h3>Seyahat Bilgileri</h3>
           <h5>Seyahat Tarihi: {insuranceDetails.travelDate}</h5>
           <h5>Seyahat Yeri: {insuranceDetails.region}</h5>
           <h5>Seyahat Sebebi: {insuranceDetails.reason}</h5>
@@ -348,3 +330,6 @@ const Support = ({ onNext, fiyat }) => {
 };
 
 export default Support;
+
+
+
