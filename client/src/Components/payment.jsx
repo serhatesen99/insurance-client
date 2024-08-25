@@ -91,7 +91,7 @@ const PaymentForm = ({ onNext }) => {
         maxWidth: 450,
         margin: "0 auto",
         padding: "20px 0",
-        backgroundColor: "#f9f3ef",
+        backgroundColor: "#ffffff", // Arka plan rengini beyaz olarak güncelledik
       }}
     >
       <Typography variant="h6" align="center" gutterBottom>
@@ -249,5 +249,6 @@ const PaymentForm = ({ onNext }) => {
 };
 
 export default PaymentForm;
+
 
 

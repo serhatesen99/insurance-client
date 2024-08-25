@@ -224,7 +224,7 @@ const OfferComponent = ({ onNext }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Teminat Türü</TableCell>
+                <TableCell >Teminat Türü</TableCell>
                 {offers.map((offer) => (
                   <TableCell key={offer.name} align="center">
                     {offer.name}
@@ -234,7 +234,7 @@ const OfferComponent = ({ onNext }) => {
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell>Seyahatin İptali</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Seyahatin İptali</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -252,7 +252,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Bagaj Kaybı</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Bagaj Kaybı</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -269,7 +269,7 @@ const OfferComponent = ({ onNext }) => {
                 ))}
               </TableRow>
               <TableRow>
-                <TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>
                   Kaza Ve Ani Rahatsızlık Sonucu Tedavi Masrafları
                 </TableCell>
                 {offers.map((offer) => (
@@ -286,10 +286,10 @@ const OfferComponent = ({ onNext }) => {
                     {offer.coverage.kaza}
                   </TableCell>
                 ))}
-              </TableRow>
+              </TableRow> 
 
               <TableRow>
-                <TableCell>Aktarma Uçuşunun Kaçırılması</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Aktarma Uçuşunun Kaçırılması</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -307,7 +307,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Gıda Zehirlenmesi</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Gıda Zehirlenmesi</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -325,7 +325,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Seyahatin Gecikmesi</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Seyahatin Gecikmesi</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -343,7 +343,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Overbooking Nedeniyle Gecikme</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Overbooking Nedeniyle Gecikme</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -361,7 +361,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Erken Dönüş Masrafları</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Erken Dönüş Masrafları</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -379,7 +379,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Tedavi Nedeniyle Konaklama</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Tedavi Nedeniyle Konaklama </TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -397,7 +397,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Refakatçinin Konaklaması</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Refakatçinin Konaklaması</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -415,7 +415,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Bagajın Bulunması Ve Ulaştırılması</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Bagajın Bulunması Ve Ulaştırılması</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -433,7 +433,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Bagaj Gecikmesi</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Bagaj Gecikmesi</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -451,7 +451,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Vize Reddi</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Vize Reddi</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -469,7 +469,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Mücbir Sebeple Uçuşun Kaçırılması</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Mücbir Sebeple Uçuşun Kaçırılması</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -487,7 +487,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Hukuki Danışma</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Hukuki Danışma</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -505,7 +505,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Acil Mesajların İletilmesi</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Acil Mesajların İletilmesi</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -523,7 +523,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>İlaç Gönderilmesi</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>İlaç Gönderilmesi</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -541,7 +541,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Kefalet İçin Avans Ödeme </TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Kefalet İçin Avans Ödeme </TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -559,7 +559,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Yurt Dışında Nakit Avans</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Yurt Dışında Nakit Avans</TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -577,7 +577,9 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>Sağlık Nakli Ve Cenaze Nakli</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>
+                  Sağlık Nakli Ve Cenaze Nakli
+                </TableCell>
                 {offers.map((offer) => (
                   <TableCell
                     key={offer.name}
@@ -595,7 +597,7 @@ const OfferComponent = ({ onNext }) => {
               </TableRow>
 
               <TableRow>
-                <TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>
                   Taburcu Olduktan Sonra İkametgahına Geri Dönüş
                 </TableCell>
                 {offers.map((offer) => (
