@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Barcode from "react-barcode";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import allianzLogo from "../assets/allianzLogo.png";
 
 const PolicyDetails = () => {
@@ -9,7 +11,6 @@ const PolicyDetails = () => {
     const generatePolicyNumber = () => {
       return Math.floor(100000 + Math.random() * 900000).toString();
     };
-
     setPolicyNumber(generatePolicyNumber());
   }, []);
 
@@ -34,8 +35,37 @@ const PolicyDetails = () => {
     cvc: "333",
   };
 
+  const downloadPDF = () => {
+    const input = document.getElementById("policy-details");
+    const downloadButton = document.getElementById("download-button");
+
+    if (input && downloadButton) {
+      downloadButton.style.display = "none";
+
+      html2canvas(input, { scale: 3 })
+        .then((canvas) => {
+          const imgData = canvas.toDataURL("image/png");
+          const pdf = new jsPDF("p", "mm", "a4");
+
+          const imgWidth = 210;
+          const pageHeight = 297;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+          pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+
+          pdf.save(`policy_${policyNumber}.pdf`);
+
+          downloadButton.style.display = "block";
+        })
+        .catch((error) => {
+          console.error("Error generating PDF:", error);
+          downloadButton.style.display = "block";
+        });
+    }
+  };
+
   return (
-    <div style={styles.container}>
+    <div id="policy-details" style={styles.container}>
       <div style={styles.header}>
         <img src={allianzLogo} alt="Allianz Sigorta" style={styles.logo} />
         <div style={styles.policyNumber}>
@@ -53,7 +83,6 @@ const PolicyDetails = () => {
         <p><strong>Sigorta Şirketi:</strong> {policyData.insuranceCompany}</p>
         <p><strong>Telefon:</strong> {policyData.insurancePhone}</p>
       </div>
-
       <div style={styles.section}>
         <h2 style={styles.sectionTitleLarge}>Sigortalı Bilgileri</h2>
         <p><strong>İsim:</strong> {policyData.insuredName}</p>
@@ -67,19 +96,24 @@ const PolicyDetails = () => {
         <p><strong>Seyahat Yeri:</strong> {policyData.travelLocation}</p>
         <p><strong>Seyahat Sebebi:</strong> {policyData.travelReason}</p>
       </div>
-
       <div style={styles.section}>
         <h2 style={styles.sectionTitleLarge}>Ödeme Bilgileri</h2>
         <p><strong>Kart Numarası:</strong> {policyData.cardNumber}</p>
         <p><strong>Son Kullanma Tarihi:</strong> {policyData.cardDate}</p>
         <p><strong>Güvenlik Kodu:</strong> {policyData.cvc}</p>
       </div>
-
       <div style={styles.section}>
         <h2 style={styles.sectionTitleLarge}>Ödenen Tutar Bilgileri</h2>
         <p><strong>Ödenen Tutar (TL):</strong> {policyData.amountPaid}</p>
         <p><strong>Ödeme Türü:</strong> {policyData.amountType}</p>
       </div>
+      <button
+        id="download-button"
+        onClick={downloadPDF}
+        style={styles.downloadButton}
+      >
+        PDF İndir
+      </button>
     </div>
   );
 };
@@ -87,7 +121,7 @@ const PolicyDetails = () => {
 const styles = {
   container: {
     fontFamily: "Arial, sans-serif",
-    maxWidth: "600px",
+    maxWidth: "800px",
     margin: "0 auto",
     padding: "20px",
     backgroundColor: "#fdfdfd",
@@ -98,11 +132,11 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "20px",
+    marginBottom: "10px", // Adjusted to move the section closer to the logo
   },
   logo: {
     height: "40px",
-    marginBottom: "120px",
+    marginBottom: "20px", // Adjusted to reduce the space below the logo
   },
   policyNumber: {
     textAlign: "right",
@@ -119,22 +153,36 @@ const styles = {
   },
   title: {
     textAlign: "left",
-    marginBottom: "50px",
-    marginTop: "-80px",
+    marginBottom: "20px", // Adjusted to move the title closer to the content above
+    marginTop: "-50px", // Adjusted to move the title closer to the logo
     fontSize: "23px",
     fontWeight: "bold",
     color: "#003781",
   },
   section: {
-    marginBottom: "40px", 
+    marginBottom: "30px", // Adjusted to reduce the space between sections
   },
   sectionTitleLarge: {
     fontWeight: "bold",
-    fontSize: "22px", 
-    marginBottom: "20px",
+    fontSize: "22px",
+    marginBottom: "10px", // Adjusted to move section titles closer to the content
+  },
+  downloadButton: {
+    display: "block",
+    width: "100%",
+    padding: "10px 0",
+    backgroundColor: "#003781",
+    color: "#fff",
+    textAlign: "center",
+    fontSize: "18px",
+    fontWeight: "bold",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
   },
 };
 
 export default PolicyDetails;
+
 
 

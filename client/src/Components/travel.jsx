@@ -45,7 +45,7 @@ const TravelInfo = ({ personalInfo, onNext }) => {
 
       const newPrices = offers.map((offer) => ({
         ...offer,
-        price: (policyDays * offer.factor).toFixed(2) + " ₺",
+        price: (policyDays * offer.factor) + " ₺",
       }));
 
       setCalculatedPrices(newPrices);

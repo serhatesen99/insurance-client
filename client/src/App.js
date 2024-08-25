@@ -25,7 +25,7 @@ import {
 import seyahatLogo from "./assets/seyahat.jpeg";
 
 import { Provider } from "react-redux";
-import  store  from "./Components/store";
+import store from "./Components/store";
 
 
 const steps = [
@@ -55,6 +55,7 @@ const HeroSection = () => {
 
 const App = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState(0);
   const [personalInfo, setPersonalInfo] = useState({
     name: "",
     tcNo: "",
@@ -67,11 +68,14 @@ const App = () => {
         tcNo: formData.tcNumber,
       });
     }
+    setCompletedSteps((prev) => Math.max(prev, activeStep + 1));
     setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
   };
 
-  const genelİlerleme = () => {
-    setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
+  const handleStepClick = (stepIndex) => {
+    if (stepIndex <= completedSteps) {
+      setActiveStep(stepIndex);
+    }
   };
 
   const renderStepContent = (step) => {
@@ -81,13 +85,13 @@ const App = () => {
       case 1:
         return <TravelInfo personalInfo={personalInfo} onNext={handleNext} />;
       case 2:
-        return <SigortaTeklifTablosu onNext={genelİlerleme} />;
+        return <SigortaTeklifTablosu onNext={handleNext} />;
       case 3:
-        return <Support onNext={genelİlerleme} />;
+        return <Support onNext={handleNext} />;
       case 4:
-        return <PaymentForm  onNext={genelİlerleme}/>;
+        return <PaymentForm onNext={handleNext} />;
       case 5:
-        return <PolicyDetails/>;
+        return <PolicyDetails />;
       default:
         return <div>Adım Bulunamadı</div>;
     }
@@ -170,8 +174,12 @@ const App = () => {
                     alternativeLabel
                     sx={{ marginTop: 4 }}
                   >
-                    {steps.map((label) => (
-                      <Step key={label}>
+                    {steps.map((label, index) => (
+                      <Step
+                        key={label}
+                        onClick={() => handleStepClick(index)}
+                        sx={{ cursor: index <= completedSteps ? "pointer" : "default" }} 
+                      >
                         <StepLabel>{label}</StepLabel>
                       </Step>
                     ))}
@@ -192,3 +200,5 @@ const App = () => {
 };
 
 export default App;
+
+
