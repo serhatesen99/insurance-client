@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import CreditCards from "react-credit-cards-2";
 import "react-credit-cards-2/dist/es/styles-compiled.css";
+import axios from "axios"; // Axios'u import ediyoruz
 
 const PaymentForm = ({ onNext }) => {
   const [fiyat, setFiyat] = useState(0);
@@ -83,9 +84,24 @@ const PaymentForm = ({ onNext }) => {
     resolver: yupResolver(validationSchema),
   });
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    onNext();
+  const onSubmit = async (data) => {
+    try {
+      const payload = {
+        Tutar: fiyat,
+        KartNo: data.cardNumber,
+        OdemeTuru: data.paymentType,
+      };
+
+      const response = await axios.post(
+        "https://localhost:7226/api/Odeme/Home",
+        payload
+      );
+
+      console.log("Backend yanıtı:", response.data);
+      onNext();
+    } catch (error) {
+      console.error("Ödeme gönderiminde hata oluştu:", error);
+    }
   };
 
   const handleCardDetailChange = (event) => {
@@ -95,7 +111,7 @@ const PaymentForm = ({ onNext }) => {
       const expiryMonth =
         name === "expiryMonth" ? value : cardDetails.expiry.slice(0, 2);
       const expiryYear =
-        name === "expiryYear" ? value : cardDetails.expiry.slice(3); // MM/YY formatına göre
+        name === "expiryYear" ? value : cardDetails.expiry.slice(3);
       setCardDetails((prev) => ({
         ...prev,
         expiry: `${expiryMonth}/${expiryYear}`,
@@ -277,7 +293,6 @@ const PaymentForm = ({ onNext }) => {
                 field.onChange(e);
                 setCardDetails({ ...cardDetails, cvc: e.target.value });
               }}
-              name="cvc"
             />
           )}
         />
@@ -309,9 +324,9 @@ const PaymentForm = ({ onNext }) => {
           variant="contained"
           color="primary"
           fullWidth
-          sx={{ marginTop: "20px", padding: "10px 0", fontSize: "16px" }}
+          sx={{ marginTop: "16px" }}
         >
-          ÖDEME YAP
+          Ödemeyi Tamamla
         </Button>
       </form>
     </Box>

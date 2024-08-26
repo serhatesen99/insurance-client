@@ -17,20 +17,20 @@ const PolicyDetails = () => {
   const policyData = {
     insuranceCompany: "Allianz Sigorta",
     insurancePhone: "0850 399 9999",
-    insuredName: "Serhat",
-    insuredSurname: "Esen",
-    insuredEmail: "serhatesen39@gmail.com",
-    insuredPhone: "5468583981",
-    insuredID: "43042449178",
-    insuredBirthDate: "03/08/2004",
-    startDate: "11/07/2024",
-    endDate: "18/07/2024",
+    insuredName: "",
+    insuredSurname: "",
+    insuredEmail: "",
+    insuredPhone: "",
+    insuredID: "",
+    insuredBirthDate: "",
+    startDate: "",
+    endDate: "",
     policyNumber: policyNumber,
-    amountPaid: "2500",
-    amountType: "Peşin Ödeme",
-    travelLocation: "Avrupa",
-    travelReason: "Eğitim",
-    cardNumber: "0000000000000000"
+    amountPaid: "",
+    amountType: "",
+    travelLocation: "",
+    travelReason: "",
+    cardNumber: ""
   };
 
   const downloadPDF = () => {
@@ -46,7 +46,7 @@ const PolicyDetails = () => {
           const pdf = new jsPDF("p", "mm", "a4");
 
           const imgWidth = 210;
-          const pageHeight = 297;
+
           const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
           pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);

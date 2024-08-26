@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { setPrices } from "./priceSlice";
+import axios from "axios";
 
 const TravelInfo = ({ personalInfo, onNext }) => {
   const dispatch = useDispatch();
@@ -57,14 +58,14 @@ const TravelInfo = ({ personalInfo, onNext }) => {
 
       const newPrices = offers.map((offer) => ({
         ...offer,
-        price: (policyDays * offer.factor) + " ₺",
+        price: policyDays * offer.factor + " ₺",
       }));
 
       setCalculatedPrices(newPrices);
     }
   }, [policyStart, policyEnd, travelArea]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const startDate = new Date(policyStart);
     const endDate = new Date(policyEnd);
     const today = new Date();
@@ -107,11 +108,27 @@ const TravelInfo = ({ personalInfo, onNext }) => {
       region: travelArea,
       reason: travelReason,
     };
-    sessionStorage.setItem("insuranceDetails", JSON.stringify(insuranceDetails));
+    sessionStorage.setItem(
+      "insuranceDetails",
+      JSON.stringify(insuranceDetails)
+    );
 
     setFormError({});
     dispatch(setPrices(calculatedPrices));
-    onNext();
+
+    const travelInfo = {
+      BasTarih: new Date(policyStart).toISOString(),
+      BitTarih: new Date(policyEnd).toISOString(),
+      Yer: travelArea,
+      Sebeb: travelReason,
+    };
+
+    try {
+      await axios.post("https://localhost:7226/api/Police/Home", travelInfo);
+      onNext();
+    } catch (error) {
+      console.error("Veri gönderiminde hata oluştu:", error);
+    }
   };
 
   const handleTravelAreaChange = (event) => {
@@ -243,5 +260,3 @@ const TravelInfo = ({ personalInfo, onNext }) => {
 };
 
 export default TravelInfo;
-
-

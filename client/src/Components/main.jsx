@@ -9,7 +9,7 @@ import {
   Box,
   FormHelperText,
 } from "@mui/material";
-
+import axios from "axios";
 
 const InsuranceForm = ({ onNext }) => {
   const [formData, setFormData] = useState({
@@ -56,6 +56,7 @@ const InsuranceForm = ({ onNext }) => {
       isAllDigits && tcNumber.length === 11 && parseInt(tcNumber[10]) % 2 === 0;
     return isValid ? "" : "Geçerli bir T.C. Kimlik Numarası giriniz.";
   };
+
   const validatePhoneNumber = (phoneNumber) => {
     const isAllDigits = /^\d+$/.test(phoneNumber);
     const isValid =
@@ -70,11 +71,10 @@ const InsuranceForm = ({ onNext }) => {
   };
 
   const validateBirthDate = (birthDate) => {
-    const birthDatePattern =
-      /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+    const birthDatePattern = /^([0-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-\d{4}$/;
     return birthDatePattern.test(birthDate)
       ? ""
-      : "Doğum tarihi GG/AA/YYYY formatında olmalıdır.";
+      : "Doğum tarihi GG-AA-YYYY formatında olmalıdır.";
   };
 
   const validateEmail = (email) => {
@@ -116,14 +116,13 @@ const InsuranceForm = ({ onNext }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const firstNameError = validateFirstName(formData.firstName);
     const lastNameError = validateLastName(formData.lastName);
     const tcNumberError = validateTcNumber(formData.tcNumber);
     const phoneNumberError = validatePhoneNumber(formData.phoneNumber);
     const birthDateError = validateBirthDate(formData.birthDate);
     const emailError = validateEmail(formData.email);
-
     const termsAcceptedError = formData.termsAccepted
       ? ""
       : "Bu alanı işaretlemeniz gerekiyor.";
@@ -163,9 +162,26 @@ const InsuranceForm = ({ onNext }) => {
         userAgreementAccepted: userAgreementAcceptedError,
       });
     } else {
-      sessionStorage.setItem("firstName", formData.firstName);
-      sessionStorage.setItem("lastName", formData.lastName);
-      onNext(formData);
+      try {
+        const dataToSend = {
+          Isim: formData.firstName,
+          Soyisim: formData.lastName,
+          TC: formData.tcNumber,
+          DogumTarih: new Date(formData.birthDate).toISOString(),
+          Tel: formData.phoneNumber,
+          Eposta: formData.email,
+        };
+
+        await axios.post("https://localhost:7226/api/Musteri/Home", dataToSend);
+        sessionStorage.setItem("firstName", formData.firstName);
+        sessionStorage.setItem("lastName", formData.lastName);
+        onNext(formData);
+      } catch (error) {
+        console.error(
+          "Server'a datayı yollarken hata çıktı.",
+          error.response ? error.response.data : error.message
+        );
+      }
     }
   };
 
@@ -175,7 +191,6 @@ const InsuranceForm = ({ onNext }) => {
       justifyContent="center"
       alignItems="center"
       height="130vh"
-     
     >
       <Box sx={{ width: "100%", maxWidth: "400px", padding: 2 }}>
         <Box display="flex" justifyContent="center" alignItems="center">
@@ -184,9 +199,9 @@ const InsuranceForm = ({ onNext }) => {
             gutterBottom
             sx={{
               fontWeight: "bold",
-              whiteSpace: "nowrap", 
+              whiteSpace: "nowrap",
               textOverflow: "ellipsis",
-              maxWidth: "1000%", 
+              maxWidth: "1000%",
             }}
           >
             5 dakikada poliçenizi oluşturmak ister misiniz?
@@ -227,7 +242,7 @@ const InsuranceForm = ({ onNext }) => {
         />
 
         <TextField
-          label="Doğum Tarihi (GG/AA/YYYY)"
+          label="Doğum Tarihi (GG-AA-YYYY)"
           name="birthDate"
           value={formData.birthDate}
           onChange={handleChange}
@@ -272,7 +287,7 @@ const InsuranceForm = ({ onNext }) => {
               <Link
                 href="https://www.allianz.com.tr/tr_TR/faydali-bilgiler-ve-linkler/izin-metinleri/azs-kisisel-verilerin-islenmesi-aydinlatma-metni.html"
                 target="_blank"
-                sx={{ fontSize: "0.875rem" }} // Adjust link text size as well
+                sx={{ fontSize: "0.875rem" }}
               >
                 Kişisel Verilerin İşlenmesi Hakkında Aydınlatma Metnini
               </Link>{" "}
