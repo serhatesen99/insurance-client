@@ -10,12 +10,20 @@ import {
   Grid,
   Box,
 } from "@mui/material";
+import CreditCards from "react-credit-cards-2";
+import "react-credit-cards-2/dist/es/styles-compiled.css";
 
 const PaymentForm = ({ onNext }) => {
   const [fiyat, setFiyat] = useState(0);
+  const [cardDetails, setCardDetails] = useState({
+    number: "",
+    name: "",
+    expiry: "",
+    cvc: "",
+  });
+
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
-
   const validationSchema = yup.object().shape({
     name: yup.string().required("Kart sahibinin adı soyadı zorunludur"),
     cardNumber: yup
@@ -25,31 +33,41 @@ const PaymentForm = ({ onNext }) => {
     expiryMonth: yup
       .string()
       .required("Son kullanma tarihi - ay zorunludur")
-      .test("is-future-date", "Son kullanma tarihi geçersiz", function (value) {
-        const { expiryYear } = this.parent;
-        if (!expiryYear) return true;
+      .test("is-valid-month", "Ay geçersiz", (value) => {
         return (
-          parseInt(expiryYear, 10) > currentYear ||
-          (parseInt(expiryYear, 10) === currentYear &&
-            parseInt(value, 10) >= currentMonth)
+          /^[0-9]{2}$/.test(value) &&
+          parseInt(value, 10) >= 1 &&
+          parseInt(value, 10) <= 12
         );
       }),
     expiryYear: yup
       .string()
       .required("Son kullanma tarihi - yıl zorunludur")
-      .test(
-        "is-future-year",
-        "Son kullanma tarihi geçersiz",
-        function (value) {
-          const { expiryMonth } = this.parent;
-          if (!expiryMonth) return true;
-          return (
-            parseInt(value, 10) > currentYear ||
-            (parseInt(value, 10) === currentYear &&
-              parseInt(expiryMonth, 10) >= currentMonth)
-          );
+      .test("is-future-date", "Son kullanma tarihi geçersiz", function (value) {
+        const expiryMonth = this.resolve(yup.ref("expiryMonth"));
+        const selectedMonth = parseInt(expiryMonth, 10);
+        const selectedYear = parseInt(value, 10);
+
+        if (!selectedMonth || !selectedYear) {
+          return true; // Ay veya yıl seçilmediyse kontrolü geç
         }
-      ),
+
+        const fullYear = currentYear + Math.floor(selectedYear / 100);
+        const isValidYear =
+          selectedYear >= fullYear % 100 || selectedYear === fullYear % 100;
+        if (selectedYear > currentYear + 10) {
+          // 10 yıl üst limit
+          return false;
+        }
+
+        if (selectedYear > currentYear) {
+          return true;
+        } else if (selectedYear === currentYear) {
+          return selectedMonth >= currentMonth;
+        }
+
+        return isValidYear;
+      }),
     cvv: yup
       .string()
       .matches(/^[0-9]{3}$/, "CVV 3 haneli olmalıdır")
@@ -70,15 +88,34 @@ const PaymentForm = ({ onNext }) => {
     onNext();
   };
 
+  const handleCardDetailChange = (event) => {
+    const { name, value } = event.target;
+
+    if (name === "expiryMonth" || name === "expiryYear") {
+      const expiryMonth =
+        name === "expiryMonth" ? value : cardDetails.expiry.slice(0, 2);
+      const expiryYear =
+        name === "expiryYear" ? value : cardDetails.expiry.slice(3); // MM/YY formatına göre
+      setCardDetails((prev) => ({
+        ...prev,
+        expiry: `${expiryMonth}/${expiryYear}`,
+      }));
+    } else {
+      setCardDetails((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
   const months = Array.from({ length: 12 }, (_, i) =>
     String(i + 1).padStart(2, "0")
   );
   const years = Array.from({ length: 10 }, (_, i) =>
-    String(new Date().getFullYear() + i)
+    String(new Date().getFullYear() + i).slice(-2)
   );
 
   useEffect(() => {
-    // Fiyatı sessionStorage'dan alın
     const storedPrice = sessionStorage.getItem("fiyat");
     if (storedPrice) {
       setFiyat(parseFloat(storedPrice) || 0);
@@ -91,7 +128,7 @@ const PaymentForm = ({ onNext }) => {
         maxWidth: 450,
         margin: "0 auto",
         padding: "20px 0",
-        backgroundColor: "#ffffff", // Arka plan rengini beyaz olarak güncelledik
+        backgroundColor: "#ffffff",
       }}
     >
       <Typography variant="h6" align="center" gutterBottom>
@@ -106,6 +143,15 @@ const PaymentForm = ({ onNext }) => {
       >
         {fiyat} ₺
       </Typography>
+
+      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+        <CreditCards
+          cvc={cardDetails.cvc}
+          expiry={cardDetails.expiry}
+          name={cardDetails.name}
+          number={cardDetails.number}
+        />
+      </Box>
 
       <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: "bold" }}>
         Kredi Kartı Bilgileri
@@ -124,9 +170,14 @@ const PaymentForm = ({ onNext }) => {
               margin="normal"
               error={!!errors.name}
               helperText={errors.name?.message}
+              onChange={(e) => {
+                field.onChange(e);
+                setCardDetails({ ...cardDetails, name: e.target.value });
+              }}
             />
           )}
         />
+
         <Controller
           name="cardNumber"
           control={control}
@@ -140,6 +191,10 @@ const PaymentForm = ({ onNext }) => {
               error={!!errors.cardNumber}
               helperText={errors.cardNumber?.message}
               inputProps={{ maxLength: 16 }}
+              onChange={(e) => {
+                field.onChange(e);
+                setCardDetails({ ...cardDetails, number: e.target.value });
+              }}
             />
           )}
         />
@@ -159,6 +214,11 @@ const PaymentForm = ({ onNext }) => {
                   margin="normal"
                   error={!!errors.expiryMonth}
                   helperText={errors.expiryMonth?.message}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    handleCardDetailChange(e);
+                  }}
+                  name="expiryMonth"
                 >
                   {months.map((month) => (
                     <MenuItem key={month} value={month}>
@@ -183,6 +243,11 @@ const PaymentForm = ({ onNext }) => {
                   margin="normal"
                   error={!!errors.expiryYear}
                   helperText={errors.expiryYear?.message}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    handleCardDetailChange(e);
+                  }}
+                  name="expiryYear"
                 >
                   {years.map((year) => (
                     <MenuItem key={year} value={year}>
@@ -208,6 +273,11 @@ const PaymentForm = ({ onNext }) => {
               error={!!errors.cvv}
               helperText={errors.cvv?.message}
               inputProps={{ maxLength: 3 }}
+              onChange={(e) => {
+                field.onChange(e);
+                setCardDetails({ ...cardDetails, cvc: e.target.value });
+              }}
+              name="cvc"
             />
           )}
         />
@@ -249,6 +319,3 @@ const PaymentForm = ({ onNext }) => {
 };
 
 export default PaymentForm;
-
-
-

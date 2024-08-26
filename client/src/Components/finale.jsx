@@ -21,18 +21,16 @@ const PolicyDetails = () => {
     insuredSurname: "Esen",
     insuredEmail: "serhatesen39@gmail.com",
     insuredPhone: "5468583981",
-    insuredID: "43********",
+    insuredID: "43042449178",
     insuredBirthDate: "03/08/2004",
     startDate: "11/07/2024",
     endDate: "18/07/2024",
     policyNumber: policyNumber,
-    amountPaid: "1010",
+    amountPaid: "2500",
     amountType: "Peşin Ödeme",
     travelLocation: "Avrupa",
     travelReason: "Eğitim",
-    cardNumber: "0000000000000000",
-    cardDate: "6 / 25",
-    cvc: "333",
+    cardNumber: "0000000000000000"
   };
 
   const downloadPDF = () => {
@@ -99,11 +97,6 @@ const PolicyDetails = () => {
       <div style={styles.section}>
         <h2 style={styles.sectionTitleLarge}>Ödeme Bilgileri</h2>
         <p><strong>Kart Numarası:</strong> {policyData.cardNumber}</p>
-        <p><strong>Son Kullanma Tarihi:</strong> {policyData.cardDate}</p>
-        <p><strong>Güvenlik Kodu:</strong> {policyData.cvc}</p>
-      </div>
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitleLarge}>Ödenen Tutar Bilgileri</h2>
         <p><strong>Ödenen Tutar (TL):</strong> {policyData.amountPaid}</p>
         <p><strong>Ödeme Türü:</strong> {policyData.amountType}</p>
       </div>

@@ -27,6 +27,18 @@ const TravelInfo = ({ personalInfo, onNext }) => {
   const [calculatedPrices, setCalculatedPrices] = useState([]);
 
   useEffect(() => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const dayAfterTomorrow = new Date(tomorrow);
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 1);
+
+    setPolicyStart(tomorrow.toISOString().split("T")[0]);
+    setPolicyEnd(dayAfterTomorrow.toISOString().split("T")[0]);
+  }, []);
+
+  useEffect(() => {
     if (policyStart && policyEnd && travelArea) {
       const startDate = new Date(policyStart);
       const endDate = new Date(policyEnd);
@@ -90,14 +102,13 @@ const TravelInfo = ({ personalInfo, onNext }) => {
       return;
     }
 
-  
     const insuranceDetails = {
       travelDate: `${policyStart} - ${policyEnd}`,
       region: travelArea,
       reason: travelReason,
     };
     sessionStorage.setItem("insuranceDetails", JSON.stringify(insuranceDetails));
-    
+
     setFormError({});
     dispatch(setPrices(calculatedPrices));
     onNext();
@@ -232,4 +243,5 @@ const TravelInfo = ({ personalInfo, onNext }) => {
 };
 
 export default TravelInfo;
+
 

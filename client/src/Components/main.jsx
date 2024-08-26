@@ -10,6 +10,7 @@ import {
   FormHelperText,
 } from "@mui/material";
 
+
 const InsuranceForm = ({ onNext }) => {
   const [formData, setFormData] = useState({
     firstName: "",
