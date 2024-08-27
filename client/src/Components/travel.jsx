@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { setPrices } from "./priceSlice";
-import axios from "axios";
+
 
 const TravelInfo = ({ personalInfo, onNext }) => {
   const dispatch = useDispatch();
@@ -65,44 +65,38 @@ const TravelInfo = ({ personalInfo, onNext }) => {
     }
   }, [policyStart, policyEnd, travelArea]);
 
-  const handleNext = async () => {
+  const handleNext = () => {
     const startDate = new Date(policyStart);
     const endDate = new Date(policyEnd);
     const today = new Date();
     const errors = {};
-
+  
     if (!policyStart) {
       errors.policyStart = "Lütfen poliçe başlangıç tarihini seçin.";
     } else if (startDate < today) {
       errors.policyStart = "Poliçe başlangıç tarihi geçmiş bir tarihte olamaz.";
     }
-
+  
     if (!policyEnd) {
       errors.policyEnd = "Lütfen poliçe bitiş tarihini seçin.";
     } else if (endDate <= startDate) {
       errors.policyEnd =
         "Poliçe bitiş tarihi, başlangıç tarihinden en az 1 gün sonra olmalıdır.";
-    } else {
-      const tripEndDate = new Date("2023-12-31");
-      if (endDate <= tripEndDate) {
-        errors.policyEnd =
-          "Poliçe bitiş tarihi, seyahatin bitiş tarihinden en az 1 gün sonra olmalıdır.";
-      }
     }
-
+  
     if (!travelArea) {
       errors.travelArea = "Lütfen seyahat yerini seçin.";
     }
-
+  
     if (!travelReason) {
       errors.travelReason = "Lütfen seyahat sebebini seçin.";
     }
-
+  
     if (Object.keys(errors).length > 0) {
       setFormError(errors);
       return;
     }
-
+  
     const insuranceDetails = {
       travelDate: `${policyStart} - ${policyEnd}`,
       region: travelArea,
@@ -112,30 +106,13 @@ const TravelInfo = ({ personalInfo, onNext }) => {
       "insuranceDetails",
       JSON.stringify(insuranceDetails)
     );
-
+  
     setFormError({});
     dispatch(setPrices(calculatedPrices));
-
-    const travelInfo = {
-      BasTarih: new Date(policyStart).toISOString(),
-      BitTarih: new Date(policyEnd).toISOString(),
-      Yer: travelArea,
-      Sebeb: travelReason,
-    };
-
-    try {
-      const response = await axios.post(
-        "https://localhost:7226/api/Police/Home",
-        travelInfo
-      );
-      const policeId = response.data.id;
-      sessionStorage.setItem("policeId", policeId);
-
-      onNext();
-    } catch (error) {
-      console.error("Veri gönderiminde hata oluştu:", error);
-    }
+  
+    onNext();
   };
+  
 
   const handleTravelAreaChange = (event) => {
     const value = event.target.value;

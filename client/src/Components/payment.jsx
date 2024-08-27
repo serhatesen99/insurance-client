@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import CreditCards from "react-credit-cards-2";
 import "react-credit-cards-2/dist/es/styles-compiled.css";
-import axios from "axios"; // Axios'u import ediyoruz
+import axios from "axios"; 
 
 const PaymentForm = ({ onNext }) => {
   const [fiyat, setFiyat] = useState(0);
@@ -83,27 +83,49 @@ const PaymentForm = ({ onNext }) => {
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
-
+  
   const onSubmit = async (data) => {
     try {
-      const payload = {
-        Tutar: fiyat,
-        KartNo: data.cardNumber,
-        OdemeTuru: data.paymentType,
-      };
-
-      const response = await axios.post(
+      // Ödeme ID'yi al
+      const paymentResponse = await axios.post(
         "https://localhost:7226/api/Odeme/Home",
-        payload
+        {
+          Tutar: fiyat,
+          KartNo: data.cardNumber,
+          OdemeTuru: data.paymentType,
+        }
       );
-
-      const odemeId = response.data.id;
+  
+      const odemeId = paymentResponse.data.id;
       sessionStorage.setItem("odemeId", odemeId);
+  
+      // Sigorta detaylarını al
+      const insuranceDetails = JSON.parse(sessionStorage.getItem("insuranceDetails"));
+      const travelInfo = {
+        BasTarih: new Date(insuranceDetails.travelDate.split(" - ")[0]).toISOString(),
+        BitTarih: new Date(insuranceDetails.travelDate.split(" - ")[1]).toISOString(),
+        Yer: insuranceDetails.region,
+        Sebeb: insuranceDetails.reason,
+        MusteriId: sessionStorage.getItem("customerId"),
+        OdemeId: odemeId
+      };
+  
+      // Poliçe oluştur
+      const policeResponse = await axios.post(
+        "https://localhost:7226/api/Police/Home",
+        travelInfo
+      );
+  
+      const policeId = policeResponse.data.id;
+      sessionStorage.setItem("policeId", policeId);
+  
       onNext();
     } catch (error) {
-      console.error("Ödeme gönderiminde hata oluştu:", error);
+      console.error("İşlem sırasında hata oluştu:", error);
     }
   };
+  
+  
 
   const handleCardDetailChange = (event) => {
     const { name, value } = event.target;
