@@ -7,10 +7,17 @@ import allianzLogo from "../assets/allianzLogo.png";
 
 const PolicyDetails = () => {
   const [policyData, setPolicyData] = useState(null);
-  
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
 
   useEffect(() => {
-    const fetchPolicyData = async () => {
+    const fetchCustomerData = async () => {
       try {
         const customerId = sessionStorage.getItem("customerId");
         if (!customerId) {
@@ -18,39 +25,92 @@ const PolicyDetails = () => {
           return;
         }
         console.log(`Müşteri ID: ${customerId}`);
-  
-        const response = await axios.get(`https://localhost:7226/api/Musteri/Home/${customerId}`);
-        console.log("API yanıtı:", response);
-  
-        const data = response.data;
-  
+
+        const response = await axios.get(
+          `https://localhost:7226/api/Musteri/Home/${customerId}`
+        );
+        console.log("Müşteri API yanıtı:", response);
+
+        return response.data;
+      } catch (error) {
+        console.error("Müşteri verisi alınırken hata oluştu:", error);
+        throw error;
+      }
+    };
+
+    const fetchPolicyData = async () => {
+      try {
+        const policeId = sessionStorage.getItem("policeId");
+        if (!policeId) {
+          console.error("Poliçe ID'si bulunamadı.");
+          return;
+        }
+        console.log(`Poliçe ID: ${policeId}`);
+
+        const response = await axios.get(
+          `https://localhost:7226/api/Police/Home/${policeId}`
+        );
+        console.log("Poliçe API yanıtı:", response);
+
+        return response.data;
+      } catch (error) {
+        console.error("Poliçe verisi alınırken hata oluştu:", error);
+        throw error;
+      }
+    };
+
+    const fetchPaymentData = async () => {
+      try {
+        const odemeId = sessionStorage.getItem("odemeId");
+        if (!odemeId) {
+          console.error("Ödeme ID'si bulunamadı.");
+          return;
+        }
+        console.log(`Ödeme ID: ${odemeId}`);
+
+        const response = await axios.get(
+          `https://localhost:7226/api/Odeme/Home/${odemeId}`
+        );
+        console.log("Ödeme API yanıtı:", response);
+
+        return response.data;
+      } catch (error) {
+        console.error("Ödeme verisi alınırken hata oluştu:", error);
+        throw error;
+      }
+    };
+
+    const fetchData = async () => {
+      try {
+        const customerData = await fetchCustomerData();
+        const policyData = await fetchPolicyData();
+        const paymentData = await fetchPaymentData();
+
         setPolicyData({
           insuranceCompany: "Allianz Sigorta",
           insurancePhone: "0850 399 9999",
-          insuredName: data.isim,
-          insuredSurname: data.soyisim,
-          insuredEmail: data.eposta,
-          insuredPhone: data.tel,
-          insuredID: data.tc,
-          insuredBirthDate: data.dogumTarih,
-          startDate: data.startDate,
-          endDate: data.endDate,
+          insuredName: customerData.isim,
+          insuredSurname: customerData.soyisim,
+          insuredEmail: customerData.eposta,
+          insuredPhone: customerData.tel,
+          insuredID: customerData.tc,
+          insuredBirthDate: formatDate(customerData.dogumTarih),
+          startDate: formatDate(policyData.basTarih),
+          endDate: formatDate(policyData.bitTarih),
           policyNumber: generatePolicyNumber(),
-          amountPaid: data.tutar,
-          amountType: data.amountType,
-          travelLocation: data.travelLocation,
-          travelReason: data.travelReason,
-          cardNumber: data.cardNumber,
+          amountPaid: paymentData.tutar,
+          amountType: paymentData.odemeTuru,
+          travelLocation: policyData.yer,
+          travelReason: policyData.sebeb,
+          cardNumber: paymentData.kartNo,
         });
       } catch (error) {
         console.error("Veri alınırken hata oluştu:", error);
-        console.error("Hata detayları:", error.response ? error.response.data : "Sunucuya erişilemiyor.");
       }
     };
-  
-    fetchPolicyData();
+
+    fetchData();
   }, []);
-  
 
   const generatePolicyNumber = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -81,7 +141,7 @@ const PolicyDetails = () => {
           downloadButton.style.display = "block";
         })
         .catch((error) => {
-          console.error("Error generating PDF:", error);
+          console.error("PDF oluşturulurken hata:", error);
           downloadButton.style.display = "block";
         });
     }
@@ -103,27 +163,57 @@ const PolicyDetails = () => {
       <h2 style={styles.title}>Seyahat Sağlık Sigortası Poliçesi</h2>
       <div style={styles.section}>
         <h2 style={styles.sectionTitleLarge}>Poliçe Bilgileri</h2>
-        <p><strong>Sigorta Şirketi:</strong> {policyData.insuranceCompany}</p>
-        <p><strong>Telefon:</strong> {policyData.insurancePhone}</p>
+        <p>
+          <strong>Sigorta Şirketi:</strong> {policyData.insuranceCompany}
+        </p>
+        <p>
+          <strong>Telefon:</strong> {policyData.insurancePhone}
+        </p>
       </div>
       <div style={styles.section}>
         <h2 style={styles.sectionTitleLarge}>Sigortalı Bilgileri</h2>
-        <p><strong>İsim:</strong> {policyData.insuredName}</p>
-        <p><strong>Soyisim:</strong> {policyData.insuredSurname}</p>
-        <p><strong>E-posta:</strong> {policyData.insuredEmail}</p>
-        <p><strong>Cep Telefonu:</strong> {policyData.insuredPhone}</p>
-        <p><strong>TC Kimlik Numarası:</strong> {policyData.insuredID}</p>
-        <p><strong>Doğum Tarihi:</strong> {policyData.insuredBirthDate}</p>
-        <p><strong>Sigorta Başlangıç Tarihi:</strong> {policyData.startDate}</p>
-        <p><strong>Sigorta Bitiş Tarihi:</strong> {policyData.endDate}</p>
-        <p><strong>Seyahat Yeri:</strong> {policyData.travelLocation}</p>
-        <p><strong>Seyahat Sebebi:</strong> {policyData.travelReason}</p>
+        <p>
+          <strong>İsim:</strong> {policyData.insuredName}
+        </p>
+        <p>
+          <strong>Soyisim:</strong> {policyData.insuredSurname}
+        </p>
+        <p>
+          <strong>E-posta:</strong> {policyData.insuredEmail}
+        </p>
+        <p>
+          <strong>Cep Telefonu:</strong> {policyData.insuredPhone}
+        </p>
+        <p>
+          <strong>TC Kimlik Numarası:</strong> {policyData.insuredID}
+        </p>
+        <p>
+          <strong>Doğum Tarihi:</strong> {policyData.insuredBirthDate}
+        </p>
+        <p>
+          <strong>Sigorta Başlangıç Tarihi:</strong> {policyData.startDate}
+        </p>
+        <p>
+          <strong>Sigorta Bitiş Tarihi:</strong> {policyData.endDate}
+        </p>
+        <p>
+          <strong>Seyahat Yeri:</strong> {policyData.travelLocation}
+        </p>
+        <p>
+          <strong>Seyahat Sebebi:</strong> {policyData.travelReason}
+        </p>
       </div>
       <div style={styles.section}>
         <h2 style={styles.sectionTitleLarge}>Ödeme Bilgileri</h2>
-        <p><strong>Kart Numarası:</strong> {policyData.cardNumber}</p>
-        <p><strong>Ödenen Tutar (TL):</strong> {policyData.amountPaid}</p>
-        <p><strong>Ödeme Türü:</strong> {policyData.amountType}</p>
+        <p>
+          <strong>Kart Numarası:</strong> {policyData.cardNumber}
+        </p>
+        <p>
+          <strong>Ödenen Tutar (TL):</strong> {policyData.amountPaid}
+        </p>
+        <p>
+          <strong>Ödeme Türü:</strong> {policyData.amountType}
+        </p>
       </div>
       <button
         id="download-button"
@@ -150,11 +240,11 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "10px", 
+    marginBottom: "10px",
   },
   logo: {
     height: "40px",
-    marginBottom: "20px", 
+    marginBottom: "20px",
   },
   policyNumber: {
     textAlign: "right",
@@ -171,19 +261,19 @@ const styles = {
   },
   title: {
     textAlign: "left",
-    marginBottom: "20px", 
-    marginTop: "-50px", 
+    marginBottom: "20px",
+    marginTop: "-50px",
     fontSize: "23px",
     fontWeight: "bold",
     color: "#003781",
   },
   section: {
-    marginBottom: "30px", 
+    marginBottom: "30px",
   },
   sectionTitleLarge: {
     fontWeight: "bold",
     fontSize: "22px",
-    marginBottom: "10px", 
+    marginBottom: "10px",
   },
   downloadButton: {
     display: "block",
@@ -201,8 +291,3 @@ const styles = {
 };
 
 export default PolicyDetails;
-
-
-
-
-

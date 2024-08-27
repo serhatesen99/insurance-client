@@ -50,14 +50,14 @@ const PaymentForm = ({ onNext }) => {
         const selectedYear = parseInt(value, 10);
 
         if (!selectedMonth || !selectedYear) {
-          return true; // Ay veya yıl seçilmediyse kontrolü geç
+          return true; 
         }
 
         const fullYear = currentYear + Math.floor(selectedYear / 100);
         const isValidYear =
           selectedYear >= fullYear % 100 || selectedYear === fullYear % 100;
         if (selectedYear > currentYear + 10) {
-          // 10 yıl üst limit
+ 
           return false;
         }
 
@@ -97,7 +97,8 @@ const PaymentForm = ({ onNext }) => {
         payload
       );
 
-      console.log("Backend yanıtı:", response.data);
+      const odemeId = response.data.id;
+      sessionStorage.setItem("odemeId", odemeId);
       onNext();
     } catch (error) {
       console.error("Ödeme gönderiminde hata oluştu:", error);
@@ -205,7 +206,7 @@ const PaymentForm = ({ onNext }) => {
               fullWidth
               margin="normal"
               error={!!errors.cardNumber}
-              helperText={errors.cardNumber?.message}
+              helperText={errors.cardNumber?.message} 
               inputProps={{ maxLength: 16 }}
               onChange={(e) => {
                 field.onChange(e);
@@ -311,10 +312,10 @@ const PaymentForm = ({ onNext }) => {
               error={!!errors.paymentType}
               helperText={errors.paymentType?.message}
             >
-              <MenuItem value="Pesin">Peşin Ödeme</MenuItem>
-              <MenuItem value="Taksit3">3 Taksit</MenuItem>
-              <MenuItem value="Taksit6">6 Taksit</MenuItem>
-              <MenuItem value="Taksit9">9 Taksit</MenuItem>
+              <MenuItem value="Peşin Ödeme">Peşin Ödeme</MenuItem>
+              <MenuItem value="3 Taksit">3 Taksit</MenuItem>
+              <MenuItem value="6 Taksit">6 Taksit</MenuItem>
+              <MenuItem value="9 Taksit">9 Taksit</MenuItem>
             </TextField>
           )}
         />

@@ -124,7 +124,13 @@ const TravelInfo = ({ personalInfo, onNext }) => {
     };
 
     try {
-      await axios.post("https://localhost:7226/api/Police/Home", travelInfo);
+      const response = await axios.post(
+        "https://localhost:7226/api/Police/Home",
+        travelInfo
+      );
+      const policeId = response.data.id;
+      sessionStorage.setItem("policeId", policeId);
+
       onNext();
     } catch (error) {
       console.error("Veri gönderiminde hata oluştu:", error);
