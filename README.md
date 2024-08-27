@@ -1,1 +1,1 @@
-allianz seyahat sağlık sigortası bölümünü yaptığım fullstack proje.
+full stack yaptığım proje allianz seyahat sağlık sigortasının client tarafı .
