@@ -1,37 +1,64 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Barcode from "react-barcode";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import allianzLogo from "../assets/allianzLogo.png";
 
 const PolicyDetails = () => {
-  const [policyNumber, setPolicyNumber] = useState("");
+  const [policyData, setPolicyData] = useState(null);
+  
 
   useEffect(() => {
-    const generatePolicyNumber = () => {
-      return Math.floor(100000 + Math.random() * 900000).toString();
+    const fetchPolicyData = async () => {
+      try {
+        const customerId = sessionStorage.getItem("customerId");
+        if (!customerId) {
+          console.error("Müşteri ID'si bulunamadı.");
+          return;
+        }
+        console.log(`Müşteri ID: ${customerId}`);
+  
+        const response = await axios.get(`https://localhost:7226/api/Musteri/Home/${customerId}`);
+        console.log("API yanıtı:", response);
+  
+        const data = response.data;
+  
+        setPolicyData({
+          insuranceCompany: "Allianz Sigorta",
+          insurancePhone: "0850 399 9999",
+          insuredName: data.isim,
+          insuredSurname: data.soyisim,
+          insuredEmail: data.eposta,
+          insuredPhone: data.tel,
+          insuredID: data.tc,
+          insuredBirthDate: data.dogumTarih,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          policyNumber: generatePolicyNumber(),
+          amountPaid: data.tutar,
+          amountType: data.amountType,
+          travelLocation: data.travelLocation,
+          travelReason: data.travelReason,
+          cardNumber: data.cardNumber,
+        });
+      } catch (error) {
+        console.error("Veri alınırken hata oluştu:", error);
+        console.error("Hata detayları:", error.response ? error.response.data : "Sunucuya erişilemiyor.");
+      }
     };
-    setPolicyNumber(generatePolicyNumber());
+  
+    fetchPolicyData();
   }, []);
+  
 
-  const policyData = {
-    insuranceCompany: "Allianz Sigorta",
-    insurancePhone: "0850 399 9999",
-    insuredName: "",
-    insuredSurname: "",
-    insuredEmail: "",
-    insuredPhone: "",
-    insuredID: "",
-    insuredBirthDate: "",
-    startDate: "",
-    endDate: "",
-    policyNumber: policyNumber,
-    amountPaid: "",
-    amountType: "",
-    travelLocation: "",
-    travelReason: "",
-    cardNumber: ""
+  const generatePolicyNumber = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
   };
+
+  if (!policyData) {
+    return <div>Veri yükleniyor...</div>;
+  }
 
   const downloadPDF = () => {
     const input = document.getElementById("policy-details");
@@ -46,12 +73,10 @@ const PolicyDetails = () => {
           const pdf = new jsPDF("p", "mm", "a4");
 
           const imgWidth = 210;
-
           const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
           pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-
-          pdf.save(`policy_${policyNumber}.pdf`);
+          pdf.save(`policy_${policyData.policyNumber}.pdf`);
 
           downloadButton.style.display = "block";
         })
@@ -125,11 +150,11 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "10px", // Adjusted to move the section closer to the logo
+    marginBottom: "10px", 
   },
   logo: {
     height: "40px",
-    marginBottom: "20px", // Adjusted to reduce the space below the logo
+    marginBottom: "20px", 
   },
   policyNumber: {
     textAlign: "right",
@@ -146,19 +171,19 @@ const styles = {
   },
   title: {
     textAlign: "left",
-    marginBottom: "20px", // Adjusted to move the title closer to the content above
-    marginTop: "-50px", // Adjusted to move the title closer to the logo
+    marginBottom: "20px", 
+    marginTop: "-50px", 
     fontSize: "23px",
     fontWeight: "bold",
     color: "#003781",
   },
   section: {
-    marginBottom: "30px", // Adjusted to reduce the space between sections
+    marginBottom: "30px", 
   },
   sectionTitleLarge: {
     fontWeight: "bold",
     fontSize: "22px",
-    marginBottom: "10px", // Adjusted to move section titles closer to the content
+    marginBottom: "10px", 
   },
   downloadButton: {
     display: "block",
@@ -176,6 +201,8 @@ const styles = {
 };
 
 export default PolicyDetails;
+
+
 
 
 

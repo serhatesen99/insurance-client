@@ -71,10 +71,20 @@ const InsuranceForm = ({ onNext }) => {
   };
 
   const validateBirthDate = (birthDate) => {
-    const birthDatePattern = /^([0-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-\d{4}$/;
-    return birthDatePattern.test(birthDate)
+    const parts = birthDate.split("-");
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+    const dateObject = new Date(year, month, day);
+
+    const isValidDate =
+      dateObject.getDate() === day &&
+      dateObject.getMonth() === month &&
+      dateObject.getFullYear() === year;
+
+    return isValidDate
       ? ""
-      : "Doğum tarihi GG-AA-YYYY formatında olmalıdır.";
+      : "Doğum tarihi GG-AA-YYYY formatında ve geçerli bir tarih olmalıdır.";
   };
 
   const validateEmail = (email) => {
@@ -163,16 +173,22 @@ const InsuranceForm = ({ onNext }) => {
       });
     } else {
       try {
+        const [day, month, year] = formData.birthDate.split("-");
+        const formattedBirthDate = `${year}-${month}-${day}`;
         const dataToSend = {
           Isim: formData.firstName,
           Soyisim: formData.lastName,
           TC: formData.tcNumber,
-          DogumTarih: new Date(formData.birthDate).toISOString(),
+          DogumTarih: new Date(formattedBirthDate).toISOString(),
           Tel: formData.phoneNumber,
           Eposta: formData.email,
         };
-
-        await axios.post("https://localhost:7226/api/Musteri/Home", dataToSend);
+        const response = await axios.post(
+          "https://localhost:7226/api/Musteri/Home",
+          dataToSend
+        );
+        const customerId = response.data.id;
+        sessionStorage.setItem("customerId", customerId);
         sessionStorage.setItem("firstName", formData.firstName);
         sessionStorage.setItem("lastName", formData.lastName);
         onNext(formData);
