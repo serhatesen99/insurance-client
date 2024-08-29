@@ -9,7 +9,6 @@ import {
   Box,
   FormHelperText,
 } from "@mui/material";
-import axios from "axios";
 
 const InsuranceForm = ({ onNext }) => {
   const [formData, setFormData] = useState({
@@ -84,7 +83,7 @@ const InsuranceForm = ({ onNext }) => {
 
     return isValidDate
       ? ""
-      : "Doğum tarihi GG-AA-YYYY formatında ve geçerli bir tarih olmalıdır.";
+      : "Doğum tarihi GG-AA-YYYY formatında ve geçerli bir tarih olmalı.";
   };
 
   const validateEmail = (email) => {
@@ -126,7 +125,7 @@ const InsuranceForm = ({ onNext }) => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const firstNameError = validateFirstName(formData.firstName);
     const lastNameError = validateLastName(formData.lastName);
     const tcNumberError = validateTcNumber(formData.tcNumber);
@@ -172,32 +171,9 @@ const InsuranceForm = ({ onNext }) => {
         userAgreementAccepted: userAgreementAcceptedError,
       });
     } else {
-      try {
-        const [day, month, year] = formData.birthDate.split("-");
-        const formattedBirthDate = `${year}-${month}-${day}`;
-        const dataToSend = {
-          Isim: formData.firstName,
-          Soyisim: formData.lastName,
-          TC: formData.tcNumber,
-          DogumTarih: new Date(formattedBirthDate).toISOString(),
-          Tel: formData.phoneNumber,
-          Eposta: formData.email,
-        };
-        const response = await axios.post(
-          "https://localhost:7226/api/Musteri/Home",
-          dataToSend
-        );
-        const customerId = response.data.id;
-        sessionStorage.setItem("customerId", customerId);
-        sessionStorage.setItem("firstName", formData.firstName);
-        sessionStorage.setItem("lastName", formData.lastName);
-        onNext(formData);
-      } catch (error) {
-        console.error(
-          "Server'a datayı yollarken hata çıktı.",
-          error.response ? error.response.data : error.message
-        );
-      }
+      // Verileri sessionStorage'a kaydettim
+      sessionStorage.setItem("formData", JSON.stringify(formData));
+      onNext(formData);
     }
   };
 

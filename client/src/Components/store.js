@@ -1,6 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit';
-import priceReducer from './priceSlice';
-
+import { configureStore } from "@reduxjs/toolkit";
+import priceReducer from "./priceSlice";
 
 const store = configureStore({
   reducer: {
@@ -9,6 +8,3 @@ const store = configureStore({
 });
 
 export default store;
-
-
-

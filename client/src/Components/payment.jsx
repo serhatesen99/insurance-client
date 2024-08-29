@@ -86,7 +86,30 @@ const PaymentForm = ({ onNext }) => {
   
   const onSubmit = async (data) => {
     try {
-      // Ödeme ID'yi al
+      // Form verilerini sessionStorage'dan alıyorum
+      const storedFormData = JSON.parse(sessionStorage.getItem("formData"));
+      
+      // Müşteri bilgilerini veritabanına gönderiyorum
+      const [day, month, year] = storedFormData.birthDate.split("-");
+      const formattedBirthDate = `${year}-${month}-${day}`;
+      const customerData = {
+        Isim: storedFormData.firstName,
+        Soyisim: storedFormData.lastName,
+        TC: storedFormData.tcNumber,
+        DogumTarih: new Date(formattedBirthDate).toISOString(),
+        Tel: storedFormData.phoneNumber,
+        Eposta: storedFormData.email,
+      };
+      
+      const customerResponse = await axios.post(
+        "https://localhost:7226/api/Musteri/Home",
+        customerData
+      );
+      
+      const customerId = customerResponse.data.id;
+      sessionStorage.setItem("customerId", customerId);
+  
+      // Ödeme işlemi
       const paymentResponse = await axios.post(
         "https://localhost:7226/api/Odeme/Home",
         {
@@ -99,18 +122,18 @@ const PaymentForm = ({ onNext }) => {
       const odemeId = paymentResponse.data.id;
       sessionStorage.setItem("odemeId", odemeId);
   
-      // Sigorta detaylarını al
+      // Poliçe detayları
       const insuranceDetails = JSON.parse(sessionStorage.getItem("insuranceDetails"));
       const travelInfo = {
         BasTarih: new Date(insuranceDetails.travelDate.split(" - ")[0]).toISOString(),
         BitTarih: new Date(insuranceDetails.travelDate.split(" - ")[1]).toISOString(),
         Yer: insuranceDetails.region,
         Sebeb: insuranceDetails.reason,
-        MusteriId: sessionStorage.getItem("customerId"),
+        MusteriId: customerId,
         OdemeId: odemeId
       };
   
-      // Poliçe oluştur
+      // Poliçe post
       const policeResponse = await axios.post(
         "https://localhost:7226/api/Police/Home",
         travelInfo
@@ -124,6 +147,7 @@ const PaymentForm = ({ onNext }) => {
       console.error("İşlem sırasında hata oluştu:", error);
     }
   };
+  
   
   
 

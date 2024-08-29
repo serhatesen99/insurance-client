@@ -27,7 +27,6 @@ import seyahatLogo from "./assets/seyahat.jpeg";
 import { Provider } from "react-redux";
 import store from "./Components/store";
 
-
 const steps = [
   "Genel Bilgiler",
   "Seyahat Bilgileri",
@@ -178,7 +177,10 @@ const App = () => {
                       <Step
                         key={label}
                         onClick={() => handleStepClick(index)}
-                        sx={{ cursor: index <= completedSteps ? "pointer" : "default" }} 
+                        sx={{
+                          cursor:
+                            index <= completedSteps ? "pointer" : "default",
+                        }}
                       >
                         <StepLabel>{label}</StepLabel>
                       </Step>
@@ -200,5 +202,3 @@ const App = () => {
 };
 
 export default App;
-
-

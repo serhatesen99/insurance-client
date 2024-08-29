@@ -14,7 +14,6 @@ import {
 import { useDispatch } from "react-redux";
 import { setPrices } from "./priceSlice";
 
-
 const TravelInfo = ({ personalInfo, onNext }) => {
   const dispatch = useDispatch();
   const { name, tcNo } = personalInfo;
@@ -70,33 +69,33 @@ const TravelInfo = ({ personalInfo, onNext }) => {
     const endDate = new Date(policyEnd);
     const today = new Date();
     const errors = {};
-  
+
     if (!policyStart) {
       errors.policyStart = "Lütfen poliçe başlangıç tarihini seçin.";
     } else if (startDate < today) {
       errors.policyStart = "Poliçe başlangıç tarihi geçmiş bir tarihte olamaz.";
     }
-  
+
     if (!policyEnd) {
       errors.policyEnd = "Lütfen poliçe bitiş tarihini seçin.";
     } else if (endDate <= startDate) {
       errors.policyEnd =
         "Poliçe bitiş tarihi, başlangıç tarihinden en az 1 gün sonra olmalıdır.";
     }
-  
+
     if (!travelArea) {
       errors.travelArea = "Lütfen seyahat yerini seçin.";
     }
-  
+
     if (!travelReason) {
       errors.travelReason = "Lütfen seyahat sebebini seçin.";
     }
-  
+
     if (Object.keys(errors).length > 0) {
       setFormError(errors);
       return;
     }
-  
+
     const insuranceDetails = {
       travelDate: `${policyStart} - ${policyEnd}`,
       region: travelArea,
@@ -106,13 +105,12 @@ const TravelInfo = ({ personalInfo, onNext }) => {
       "insuranceDetails",
       JSON.stringify(insuranceDetails)
     );
-  
+
     setFormError({});
     dispatch(setPrices(calculatedPrices));
-  
+
     onNext();
   };
-  
 
   const handleTravelAreaChange = (event) => {
     const value = event.target.value;
