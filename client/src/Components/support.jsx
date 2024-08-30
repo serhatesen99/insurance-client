@@ -16,10 +16,10 @@ const Support = ({ onNext }) => {
   });
 
   useEffect(() => {
-    const firstName = sessionStorage.getItem("firstName") || "";
-    const lastName = sessionStorage.getItem("lastName") || "";
+    const formData = JSON.parse(sessionStorage.getItem("formData")) || {};
+    const firstName = formData.firstName || "";
+    const lastName = formData.lastName || "";
     const fullName = `${firstName} ${lastName}`;
-
     const savedInsuranceDetails = JSON.parse(
       sessionStorage.getItem("insuranceDetails")
     ) || { travelDate: "", region: "", reason: "" };
@@ -30,7 +30,7 @@ const Support = ({ onNext }) => {
       region: savedInsuranceDetails.region || "",
       reason: savedInsuranceDetails.reason || "",
     });
-
+    const storedFormData = sessionStorage.getItem("formData");
     const storedPrice = sessionStorage.getItem("fiyat");
     if (storedPrice) {
       setFiyat(parseFloat(storedPrice) || 0);
