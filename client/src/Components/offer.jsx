@@ -30,10 +30,8 @@ const OfferComponent = ({ onNext }) => {
   );
   const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState("Geniş Kapsamlı");
-  const [selectedAdditionalCoverage, setSelectedAdditionalCoverage] = useState(
-    []
-  );
-  const [expanded, setExpanded] = useState(true); // Accordion state for expansion
+  const [selectedAdditionalCoverage, setSelectedAdditionalCoverage] = useState([]);
+  const [expanded, setExpanded] = useState(true); 
 
   useEffect(() => {
     axios
@@ -46,6 +44,17 @@ const OfferComponent = ({ onNext }) => {
         console.error("Teminatlar alınırken bir hata oluştu:", error);
       });
   }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem("selectedOffer", selectedOffer);
+    console.log("Seçilen Teminat Türü Session Storage'a kaydedildi:", selectedOffer);
+  }, [selectedOffer]);
+
+  useEffect(() => {
+    const fiyat = calculateTotalPrice();
+    sessionStorage.setItem("fiyat", fiyat);
+    console.log("Fiyat Session Storage'a kaydedildi:", fiyat);
+  }, [selectedOffer, selectedAdditionalCoverage]);
 
   const additionalCoverageOptions = [
     {
@@ -126,6 +135,10 @@ const OfferComponent = ({ onNext }) => {
   );
 
   const OfferTable = ({ selectedOffer }) => {
+    const handleSelection = (type) => {
+      setSelectedOffer(type);
+    };
+
     return (
       <Accordion
         sx={{
@@ -154,9 +167,9 @@ const OfferComponent = ({ onNext }) => {
               <TableHead>
                 <TableRow>
                   <TableCell>Teminat Türü</TableCell>
-                  <TableCell align="center">Standart</TableCell>
-                  <TableCell align="center">Kapsamlı</TableCell>
-                  <TableCell align="center">Geniş Kapsamlı</TableCell>
+                  <TableCell align="center" onClick={() => handleSelection('Standart')}>Standart</TableCell>
+                  <TableCell align="center" onClick={() => handleSelection('Kapsamlı')}>Kapsamlı</TableCell>
+                  <TableCell align="center" onClick={() => handleSelection('Geniş Kapsamlı')}>Geniş Kapsamlı</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -171,7 +184,7 @@ const OfferComponent = ({ onNext }) => {
                     fontWeight: selectedOffer === type ? "bold" : "normal",
                     color: selectedOffer === type ? "#000" : "#555",
                   });
-  
+
                   return (
                     <TableRow key={offer.id} sx={rowStyle}>
                       <TableCell sx={{ fontWeight: "bold" }}>{offer.isim}</TableCell>
@@ -203,8 +216,6 @@ const OfferComponent = ({ onNext }) => {
       </Accordion>
     );
   };
-  
-  
 
   const AdditionalCoverage = ({
     selectedAdditionalCoverage,
@@ -278,11 +289,6 @@ const OfferComponent = ({ onNext }) => {
   };
 
   const fiyat = calculateTotalPrice();
-  sessionStorage.setItem("fiyat", fiyat);
-  console.log(
-    "Fiyat Session Storage'a kaydedildi:",
-    sessionStorage.getItem("fiyat")
-  );
 
   return (
     <Container maxWidth="lg">
@@ -323,3 +329,4 @@ const OfferComponent = ({ onNext }) => {
 };
 
 export default OfferComponent;
+

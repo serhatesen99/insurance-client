@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import CreditCards from "react-credit-cards-2";
 import "react-credit-cards-2/dist/es/styles-compiled.css";
-import axios from "axios"; 
+import axios from "axios";
 
 const PaymentForm = ({ onNext }) => {
   const [fiyat, setFiyat] = useState(0);
@@ -25,6 +25,7 @@ const PaymentForm = ({ onNext }) => {
 
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
+
   const validationSchema = yup.object().shape({
     name: yup.string().required("Kart sahibinin adı soyadı zorunludur"),
     cardNumber: yup
@@ -57,7 +58,6 @@ const PaymentForm = ({ onNext }) => {
         const isValidYear =
           selectedYear >= fullYear % 100 || selectedYear === fullYear % 100;
         if (selectedYear > currentYear + 10) {
- 
           return false;
         }
 
@@ -83,12 +83,16 @@ const PaymentForm = ({ onNext }) => {
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
-  
+
   const onSubmit = async (data) => {
     try {
       // Form verilerini sessionStorage'dan alıyorum
       const storedFormData = JSON.parse(sessionStorage.getItem("formData"));
-      
+      const storedInsuranceDetails = JSON.parse(sessionStorage.getItem("insuranceDetails"));
+      const TeminatIsim = sessionStorage.getItem("selectedOffer"); 
+
+      console.log(TeminatIsim)
+  
       // Müşteri bilgilerini veritabanına gönderiyorum
       const [day, month, year] = storedFormData.birthDate.split("-");
       const formattedBirthDate = `${year}-${month}-${day}`;
@@ -100,12 +104,12 @@ const PaymentForm = ({ onNext }) => {
         Tel: storedFormData.phoneNumber,
         Eposta: storedFormData.email,
       };
-      
+  
       const customerResponse = await axios.post(
         "https://localhost:7226/api/Musteri/Home",
         customerData
       );
-      
+  
       const customerId = customerResponse.data.id;
       sessionStorage.setItem("customerId", customerId);
   
@@ -123,14 +127,13 @@ const PaymentForm = ({ onNext }) => {
       sessionStorage.setItem("odemeId", odemeId);
   
       // Poliçe detayları
-      const insuranceDetails = JSON.parse(sessionStorage.getItem("insuranceDetails"));
       const travelInfo = {
-        BasTarih: new Date(insuranceDetails.travelDate.split(" - ")[0]).toISOString(),
-        BitTarih: new Date(insuranceDetails.travelDate.split(" - ")[1]).toISOString(),
-        Yer: insuranceDetails.region,
-        Sebeb: insuranceDetails.reason,
+        BasTarih: new Date(storedInsuranceDetails.travelDate.split(" - ")[0]).toISOString(),
+        BitTarih: new Date(storedInsuranceDetails.travelDate.split(" - ")[1]).toISOString(),
+        Yer: storedInsuranceDetails.region,
+        Sebeb: storedInsuranceDetails.reason,
         MusteriId: customerId,
-        OdemeId: odemeId
+        OdemeId: odemeId,
       };
   
       // Poliçe post
@@ -139,16 +142,20 @@ const PaymentForm = ({ onNext }) => {
         travelInfo
       );
   
-      const policeId = policeResponse.data.id;
-      sessionStorage.setItem("policeId", policeId);
+      const policeIdResponse = policeResponse.data.id;
+      sessionStorage.setItem("policeId", policeIdResponse);
+  
+      // Ödeme ve poliçe bilgilerini başka bir API'ye kaydedin
+      await axios.post("https://localhost:7226/api/PoliceTeminat/Home", {
+        TeminatIsim: TeminatIsim,
+        PoliceId: policeIdResponse,
+      });
   
       onNext();
     } catch (error) {
       console.error("İşlem sırasında hata oluştu:", error);
     }
   };
-  
-  
   
 
   const handleCardDetailChange = (event) => {
@@ -252,7 +259,7 @@ const PaymentForm = ({ onNext }) => {
               fullWidth
               margin="normal"
               error={!!errors.cardNumber}
-              helperText={errors.cardNumber?.message} 
+              helperText={errors.cardNumber?.message}
               inputProps={{ maxLength: 16 }}
               onChange={(e) => {
                 field.onChange(e);
@@ -381,3 +388,4 @@ const PaymentForm = ({ onNext }) => {
 };
 
 export default PaymentForm;
+
