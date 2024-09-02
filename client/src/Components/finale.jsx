@@ -136,7 +136,7 @@ const PolicyDetails = () => {
           const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
           pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-          pdf.save(`policy_${policyData.policyNumber}.pdf`);
+          pdf.save(`poliçe_${policyData.policyNumber}.pdf`);
 
           downloadButton.style.display = "block";
         })
@@ -202,17 +202,9 @@ const PolicyDetails = () => {
         <p>
           <strong>Seyahat Sebebi:</strong> {policyData.travelReason}
         </p>
-      </div>
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitleLarge}>Ödeme Bilgileri</h2>
+
         <p>
-          <strong>Kart Numarası:</strong> {policyData.cardNumber}
-        </p>
-        <p>
-          <strong>Ödenen Tutar (TL):</strong> {policyData.amountPaid}
-        </p>
-        <p>
-          <strong>Ödeme Türü:</strong> {policyData.amountType}
+          <strong>Ödenen Tutar (₺):</strong> {policyData.amountPaid}
         </p>
       </div>
       <button
